@@ -46,7 +46,9 @@ In this note I give a self-contained explanation of the Kelly method for bankrol
 
 \textbf{NOTE 2:} A second thing to remember is that we can't use the kelly criterion for portfolio allocation amongst stocks. Stocks dont behave like bets. When I take ownership of stock the time horizon of ownership is not fixed.
 
-\textbf{NOTE 3:} I'll start with the belief that maximizing the Expected value for the log of the wealth is desirable. I wont justfiy this. Intuitively -- for me -- the log of the wealth saturates quickly, so this method curbs our greed, and it stops our mathemtical methods from becoming too unrealistic. Other mathematical justfication is also available in the literature on Kelly betting. See \url{https://en.wikipedia.org/wiki/Kelly_criterion} 
+\textbf{NOTE 3:} I'll start with the belief that maximizing the Expected value for the log of the wealth is desirable. I wont justfiy this. Intuitively -- for me -- the log of the wealth saturates quickly, so this method curbs our greed, and it stops our mathematical methods from becoming too unrealistic. Other mathematical justification is also available in the literature on Kelly betting. See \url{https://en.wikipedia.org/wiki/Kelly_criterion}.  
+
+\textbf{NOTE 4:} MANY MANY more details can be found in the article \url{https://wayback.archive-it.org/all/20090320125959/http://www.edwardothorp.com/sitebuildercontent/sitebuilderfiles/KellyCriterion2007.pdf} and \url{http://www.edwardothorp.com/wp-content/uploads/2016/11/TheKellyCriterionAndTheStockMarket.pdf}. Do not get too bogged down with reading everything in the article. The basics are all here in this simpler version. Also the results from the kelly criterion for stock investing are not too surprising. It typically results into just 
 
 \section{The (Basic) Method}
 Consider the following situation:~\\
@@ -97,6 +99,7 @@ Let's continue to consider the problem of BUYING call/put options. But generaliz
 \end{enumerate}
 
 \subsection{Multiple bet sizing}
+\subsubsection{Multiple (Independent) Bets}
 Consider the situation where we want to size multiple bets. We can simply add more variables to our model and use constrained numerical multi-variate optimization methods instead of deriving closed form formulae. 
 
 Say we have $B$ bets. The expected value of log wealth is
@@ -156,6 +159,11 @@ fun: -0.8100225925445557
 """
 \end{lstlisting}
 
+\subsubsection{Multiple (Mutually Exclusive) Bets}
+Consider the situation where we want to split our money amongst binary bets which are mutually exclusive. I.e. there are $B$ bets, but only one of them can be successful, like say the underlying is at 150, we have a call at strike price that turns profitable at 200, a put that turns profitable at 100, and a strangle that pays off between 100 and 200.  See figure at the end for a cheatsheet. This example is obviously bad, the payoffs are very likely to be terrible in these set of options, but its the only example I can think of at this time. A different example is betting on multiple horses at the race track. Or maybe betting on long term call options between firms that are competing in a fixed/zero-sum market, like horses in a horse race. In any case, this is a very specialized case. 
+
+TODO for later.
+
 \subsection{Single bet with multiple potential outcomes}
 Unfortunately real-life bets -- specially options -- are not binary. There is a continuum of outcomes; for example, we may have $50\%$ probability of losing everything and a $45\%$ chance of doubling our money, and a $5\%$ chance of tripling it. How should we handle this situation? Let $S$ be the possible scenarios then we can simply plug the scenarios into our objective function as follows
 \begin{align}
@@ -214,4 +222,7 @@ fun: -0.16524207592010498
        x: array([0.        , 0.47983115, 0.05568557])
 """
 \end{lstlisting}
+
+
+\includegraphics[scale=0.5,trim=400 75 50 75,clip]{options.png}
 \end{document}
