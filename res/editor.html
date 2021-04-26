@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      html, body, textarea, #mytextarea {
+          margin: 3px;
+          padding: 3px;
+          border: 0;
+          width: 98%;
+          height: 100%;
+      }
+      textarea {
+          vertical-align:top;
+      }
+    </style>
+    <script src="https://cdn.tiny.cloud/1/kpyw195ol84f3ox8f01bcoxd4mg898c4cv7beguenz3h2cdp/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+      var useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      tinymce.init({
+        selector: '#mytextarea',
+        plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+        imagetools_cors_hosts: ['picsum.photos'],
+        menubar: 'file edit view insert format tools table help',
+        toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+        toolbar_sticky: true,
+        quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+        toolbar_mode: 'sliding',
+        contextmenu: 'link image imagetools table',
+        skin: useDarkMode ? 'oxide-dark' : 'oxide',
+        content_css: useDarkMode ? 'dark' : 'default',
+        image_caption: true,
+        file_picker_callback: function (callback, value, meta) {
+          /* Provide file and text for the link dialog */
+          if (meta.filetype === 'file') {
+            callback('https://www.google.com/logos/google.jpg', { text: 'My text' });
+          }
+          /* Provide image and alt text for the image dialog */
+          if (meta.filetype === 'image') {
+            callback('https://www.google.com/logos/google.jpg', { alt: 'My alt text' });
+          }
+
+          /* Provide alternative source and posted for the media dialog */
+          if (meta.filetype === 'media') {
+            callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
+          }
+        },
+        image_advtab: true,
+        link_list: [
+          { title: 'My page 1', value: 'https://www.tiny.cloud' }
+        ],
+        image_list: [
+          { title: 'My page 1', value: 'https://www.tiny.cloud' }
+        ],
+        image_class_list: [
+          { title: 'None', value: '' },
+          { title: 'Some class', value: 'class-name' }
+        ],
+        height: 720
+      });
+    </script>
+  </head>
+  <body>
+    <form method="post">
+      <textarea id="mytextarea">Hello, World!</textarea>
+    </form>
+  </body>
+</html>
