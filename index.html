@@ -104,6 +104,52 @@
             <p><pre><code> YYYY </code></pre>
       </details> -->
       <details>
+            <summary> Easily update configuration in a long running python process. </summary>
+            <p><pre><code> """
+CLI USAGE: 
+python listener.py l
+python listener.py c foo bar
+"""
+
+from multiprocessing.managers import SyncManager
+from time import sleep
+import sys
+
+__config__ = {}
+
+def get_config():
+    return __config__ 
+
+def listener(address='/tmp/p2', authkey=b'password'):
+    SyncManager.register("get_config", get_config)
+    manager = SyncManager(address, authkey=authkey)
+    manager.start()
+    config = manager.get_config()
+    return manager, config
+
+def controller(address='/tmp/p2', authkey=b'password'):
+    SyncManager.register("get_config")
+    manager = SyncManager(address, authkey=authkey)
+    manager.connect()
+    config = manager.get_config()
+    return config
+
+
+if __name__ == '__main__':
+    if sys.argv[1] == 'l':
+        # from remote_control import listener
+        manager, config = listener()
+        while True:
+            sleep(5)
+            print(config)
+        manager.shutdown()
+    else:
+        # from remote_control import controller
+        config = controller()    
+        config.update([(sys.argv[2], sys.argv[3])])
+ </code></pre>
+      </details>	
+      <details>
             <summary> Interactive pool for running jobs on the side in python. </summary>
             <pre><code> class InteractivePool:
     def __init__(self, J):
