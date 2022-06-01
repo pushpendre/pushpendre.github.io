@@ -56,10 +56,7 @@
                        title="profile for Pushpendre on Stack Exchange" />
                   </a>
             </p>
-            <p><a href="https://github.com/se4u">
-                  <h5>github</h5>
-                  </a>
-            </p>
+            <p><a href="https://github.com/se4u">github</a></p>
             <p><a href="https://www.linkedin.com/in/pushpendre/" >
                   <img src="https://upload.wikimedia.org/wikipedia/commons/0/01/LinkedIn_Logo.svg" width="100" height="25" alt="Linkedin Logo">
                </a>
@@ -67,7 +64,7 @@
             <p><a href="https://github.com/pushpendre/pushpendre.github.io/blob/master/index.html">Edit this page</a></p>
             <p><a href="https://github.com/pushpendre/pushpendre.github.io/deployments/activity_log?environment=github-pages">See deployment status</a></p>
 	    <details><summary>how to edit this page</summary>
-            <p>make changes to index.html and validate them using "tidy --warn-proprietary-attributes no -e -q index.html", 
+            <p>make changes to index.html and validate them using "tidy --version ; tidy --warn-proprietary-attributes no -e -q index.html",
                 this command is also added as a pre-commit hook. Also use "python -m http.server" to check that the site looks okay. For writing raw html go to <a href="res/editor.html">editor.html</a></p>
         </details>
 </div>
@@ -94,9 +91,9 @@
             <li>"Multiview lsa: Representation learning via generalized cca".Pushpendre Rastogi, <a href="http://www.cs.jhu.edu/~vandurme/">Benjamin Van Durme</a>, and <a href="http://www.cs.jhu.edu/~raman/">Raman Arora</a>. (2015) <a href="http://www.aclweb.org/anthology/N15-1058">[pdf]</a> <a href="https://zenodo.org/record/16710">[data]</a> <a href="https://github.com/se4u/mvlsa">[code]</a> <a href="http://www.aclweb.org/anthology/N15-1058.bib">[bib]</a> <a href="/mvlsa/mvlsa_poster.pdf">[poster]</a> <a href="/mvlsa/multiview-lsa-proofs-and-faq.html">[supplementary]</a></li>
             <li>"Stationarity condition for fractional sampling filters".Pushpendre Rastogi. (2011) <a href="/res/mtp.pdf">[pdf]</a></li></ul>
 <h2>Education</h2><table><tbody>
-<tr><td style="text-align: left;">Verified Certificate for Introduction to Biology</td><td>EDX</td><td>2021</td><td>Pass</td></tr>
+<tr><td style="text-align: left;"><a href="https://courses.edx.org/certificates/ce8af62f77ac47849920055856b1b15c">Introduction to Biology</a></td><td>MITx at EDX</td><td>2021</td><td>Pass</td></tr>
 <tr><td style="text-align: left;">Ph.D. and M.S. in Computer Science</td><td>Johns Hopkins University</td><td>2013-19</td><td>3.75/4.0</td></tr>
-<tr><td colspan="4" style="text-align: left;">Thesis Topic: Representation Learning for Words and Entities. I presented new methods for unsupervised learning of word and entity embeddings from texts and knowledge bases.<br />Courses and Grades: Natural Language Processing (A), Machine Learning in Complex Domains (A), Stochastic Search & Optimization (B), Parallel Programming (A-), Principles of Programming Languages (A-), Combinatorial Optimization (A+), Introduction to Convexity (A-)</td></tr>
+<tr><td colspan="4" style="text-align: left;">Thesis Topic: Representation Learning for Words and Entities. I presented new methods for unsupervised learning of word and entity embeddings from texts and knowledge bases.<br />Courses and Grades: Natural Language Processing (A), Machine Learning in Complex Domains (A), Stochastic Search &amp; Optimization (B), Parallel Programming (A-), Principles of Programming Languages (A-), Combinatorial Optimization (A+), Introduction to Convexity (A-)</td></tr>
 <tr><td style="text-align: left;">M.Tech. in Information and Communication Technology</td><td>IIT Delhi</td><td>2010-11</td><td>8.77/10</td></tr>
 <tr><td style="text-align: left;">B.Tech. in Electrical Engg.</td><td>IIT Delhi</td><td>2006-10</td><td>8.86/10</td></tr>
 </tbody></table>
@@ -108,8 +105,8 @@
       </details> -->
       <details>
             <summary> Easily update configuration in a long running python process. </summary>
-            <p><pre><code> """
-CLI USAGE: 
+            <pre><code> """
+CLI USAGE:
 python listener.py l
 python listener.py c foo bar
 """
@@ -121,7 +118,7 @@ import sys
 __config__ = {}
 
 def get_config():
-    return __config__ 
+    return __config__
 
 def listener(address='/tmp/p2', authkey=b'password'):
     SyncManager.register("get_config", get_config)
@@ -148,10 +145,10 @@ if __name__ == '__main__':
         manager.shutdown()
     else:
         # from remote_control import controller
-        config = controller()    
+        config = controller()
         config.update([(sys.argv[2], sys.argv[3])])
  </code></pre>
-      </details>	
+      </details>
       <details>
             <summary> Interactive pool for running jobs on the side in python. </summary>
             <pre><code> class InteractivePool:
