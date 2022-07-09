@@ -38,6 +38,9 @@
       <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
       <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
       <script>hljs.initHighlightingOnLoad();</script>
+      <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
+      <script src="/res/mathjax-es5-v3-2-2/tex-mml-chtml.js" type="text/javascript" charset="utf-8"></script>
+
 </head>
 
 <body>
@@ -538,9 +541,32 @@ End Function </code></pre>
 </table>
 
 <h2>Trivia</h2>
+<!-- <details><summary></summary></details> -->
+
 <details><summary>how to add trivia</summary>
       <p>First compile a pdf, either in overleaf, or using latexmk, then add all the assets, the .tex and .pdf file to res/trivia folder.
       Then add the iframe with src, loading, width, height attributes.</p>
+</details>
+<details><summary>The distribution of many-to-one functions of random variables</summary>
+<p>The formula for change of distribution under one-to-one differentiable maps is well-known. If <span class="math-tex">\( f \)</span> maps <span class="math-tex">\( x \)</span> to <span class="math-tex">\( y \)</span> then <span class="math-tex">\( p_Y(y) = p_X(f^{-1}(y)) abs(det( jac_{f^{-1}}( y )) \)</span>. However what happens in the more general case where let's say that the function is not invertible ? This can happen in situations like Z = X/Y or Z = X + Y etc. In such situations the most clean method is to compute the probability of the event underlying the CDF and then differentiating. Basically</p>
+<p><span class="math-tex">\[ \begin{align}p_Z(z) &amp;= \frac{d}{dz} \int_{\mathbf{x}} \mathbb{I}[f(\mathbf{x}) &lt; z] \ p_{\mathbf{X}}(\mathbf{x}) d\mathbf{x} = \frac{d}{dz} \int_{\mathbb{I}[f(\mathbf{x}) &lt; z]}  \ p_{\mathbf{X}}(\mathbf{x}) d\mathbf{x}
+\end{align} \]</span></p>
+<p>Now recall that <span class="math-tex">\( \frac{d}{dx}\int_a^{u(x)} f(t) dt = u'(x) f(u(x)) \)</span> therefore if we can write the acceptable region as a function of <span class="math-tex">\( z \)</span> then we are in business. For example, if <span class="math-tex">\( z = x_2/x_1 \)</span> then the acceptable region is <span class="math-tex">\( \{x_1 &gt; 0, x_2 &lt; zx_1\} \cup \{x_1 &lt; 0, x_2 &gt; zx_1\} \)</span> and the integral is <span class="math-tex">\[ \int_0^\infty x_1 p(x_1, zx_1)dx_1 + \int_{-\infty}^0-x_1p(x_1, zx_1)dx_1 \]</span>where the derivative has been interchanged assuming fubini's theorem applies in this case.</p>
+</details>
+<details><summary>Calculus Theorems</summary>
+<ul>
+<li>MVT - a continuous and differentiable function has atleast one point between a, b that achieves the linear slope between these two points.</li>
+<li>EVT - continuos functions on compact sets achieve extrema.</li>
+<li>Intermediate Value T - If f is a continuous function then the image of an interval is also an interval.</li>
+<li>Taylor's Expansion - This is the best polynomial approximation <span class="math-tex">\( f(x) = f(a) + f'(a)(x - a) + \frac{f''(a)}{2!} (x - a)^2 + ... h_k(x) (x - a)^k \)</span>with <span class="math-tex">\( \lim_{x \to a}h(x) = 0 \)</span> for analytic functions. Taylor's theorem also has a multivariate version.</li>
+<li>Newton's method for root of f(x) = x - f(x)/f'(x) derived by taylor expansion. Newton's method for optimization therefore involves the inverse of the derivative of the gradient, i.e. the inverse of hessian.</li>
+<li>Darboux's theorem - Every function that has an integral, i.e. this function resulted from the differentiation of another function, satisfied the IVT property even if it not continuous. See this page for example of a function with <a href="https://calculus.subwiki.org/wiki/Derivative_of_differentiable_function_need_not_be_continuous">non-continuous derivative&nbsp;</a> and see this page <a href="https://math.stackexchange.com/questions/292275/discontinuous-derivative">for more exotic function</a></li>
+<li>Clairaut's theorem for symmetry of second derivatives , i.e. <span style="text-decoration: underline; color: #b96ad9;">when can we interchange differentiation</span> ? The second partial derivatives need to exist and be continuous.&nbsp;</li>
+<li>Fubini's theorem, i.e. <span style="text-decoration: underline; color: #b96ad9;">when can we interchange integration</span> ? absolute integrability implies interchange is possible.</li>
+<li>Leibniz Integral rule, i.e. <span style="text-decoration: underline;"><span style="color: #e67e23; text-decoration: underline;">when can we interchange differentiation and integration</span></span> ? Let <span class="math-tex">\( f(x,t) \)</span> be a function such that both f and its partial derivative <span class="math-tex">\( f_x \)</span> are continuous and suppose that the limit functions are continuous and have continuous derivatives. Then&nbsp;<br><span class="math-tex">\[ \frac{d}{dx}\Big(\int_{a(x)}^{b(x)} f(x,t) dt\Big) = f(x,b(x)) b'(x) - f(x,a(x))a'(x) + \int_{a(x)}^{b(x)} \frac{\partial f(x,t)}{\partial x}dt \]</span></li>
+<li>Inverse function theorem -- If f is continuously differentiable in nbhd of <span class="math-tex">\( a \)</span> and its derivative is nonzero at <span class="math-tex">\( a \)</span> then the function is invertible and the inverse is continuously differentiable and the derivative is <span class="math-tex">\( 1/f'(f^{-1}(b)) \)</span></li>
+<li>Implicit function theorem -- Given a system of m equations <span class="math-tex">\( \{f_i(x_1, \ldots, x_n, y_1, \ldots, y_m) = 0 \mid i=1,\ldots,m\} \)</span> satisfied at point <span class="math-tex">\( (\bar{a},\bar{b}) \)</span> under a mild condition on the partial derivateives with respect to <span class="math-tex">\( y_i \)</span> (that the jacobian of partial derivatives wrt to y is intertible) and the system itself is continuously differentiable in a nbhd of <span class="math-tex">\( (\bar{a},\bar{b}) \)</span> then the y variables are unique continuously differentiable functions of <span class="math-tex">\( \{ x_j \} \)</span> in some nbhd of the point. And infact this theorem also gives the formula for the jacobian of this unique function.</li>
+</ul>
 </details>
 <details><summary>Difference between testing for non-stationarity tests vs testing for trend</summary>
 	<p>Stationarity simply means that the n-th order joint pdfs are independent of time. Wide-sense stationarity (or loose sense stationarity) means that the mean is constant with time, and that the correlation between any two observations only varies as a function of time. Stationarity does not mean that the the correlation function (R<sub>X</sub> (T<sub>1</sub>, 𝛕= T<sub>2</sub> - T<sub>1</sub>)) is zero or delta function. No! Wide-Sense Stationarity just means that the correlation function is invariant with time, only depends on the difference. Note that stationarity / non-stationarity describes a process, not the actual observed signal. The observed signals can still exhibit periodicity while being w-stationary. Now In an auto-regressive (AR) process, the current value of the signal is a linear function of past observations plus a noise term. This process can be non-stationary if the system has a so-called "unit-root". but AR processes <strong>may</strong> still be stationary without trend. OTOH Moving average processes (MA) are always defined as linear combinations of observations coming from some hidden iid error terms. So the MA process is <strong>always</strong> stationary. Dickey Fuller procedure tests whether a unit-root it present in an AR process. There are different versions of this test depending on exactly what type of AR process is assumed and even what is the alternative to the null hypothesis such as&nbsp;Augmented Dickey Fuller, KPSS. But none of these tests can check for whether a trend is present in the dataset because these "stationarity" tests can give false-positives for trend. If a *DF test or KPSS test says that the signal is stationary then rest assured we can say that no trend exists, but when these tests say that a trend exists, then it's possible that they are just detecting a unit-root random walk which obviously does not have actual trend.</p>
