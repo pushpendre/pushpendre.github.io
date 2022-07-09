@@ -39,6 +39,10 @@
       <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
       <script>hljs.initHighlightingOnLoad();</script>
       <!-- TODO: Switch over to chart.js? https://www.chartjs.org/docs/latest/getting-started/ -->
+      <!-- TODO: take a look at PyPortfolioOpt https://joss.theoj.org/papers/10.21105/joss.03066 and https://github.com/robertmartin8/PyPortfolioOpt -->
+      <!-- TODO: Compare my charts to the code available at https://github.com/robertmartin8/pValuation/blob/master/ProbabilisticValuation/OptionImpliedPDF.ipynb and ensure that my plots look correct -->
+      <!-- TODO: Combine this pdf with the fractional kelly rule to come up with an asset allocation rule with the goal of avoiding spans with bad returns instead of maximizing the number of good days for assets invested. -->
+      <!-- automate the collection of historical option prices by creating a logger and saving the options prices to a DB -->
       <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
       
       <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.3.min.js"></script>
@@ -286,10 +290,10 @@
 
   <button onclick="window.open('https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=https%3A%2F%2Fpushpendre.github.io%2Fres%2Fmyeqapp%2F&client_id=LF30XCN5ZDVRMA2FSELBLWBYKNQFIVF3%40AMER.OAUTHAP','_self')">Auth 1 - User interacts with resource server</button>
 
-  <button onclick="getAuthCode()">Auth 2 - App interacts with resource server </button>
+  <button onclick="getAuthCode()">Auth 2 - App interacts with resource server using callback url param </button>
   <span id="neck"></span><br></br>
 
-  <button onclick="refreshAccCode()">Get New Access token using existing Refresh token without involving the user</button>
+  <button onclick="refreshAccCode()">Auth 3 - Get New Access token using existing Refresh token without involving the user</button>
   <span id="newaccesscode"></span><br></br>
 
   <label for="ticker">Ticker:</label><input type="text" placeholder="ticker" id="ticker">
