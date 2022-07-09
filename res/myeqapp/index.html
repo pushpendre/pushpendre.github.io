@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title>Webapp</title>
+      <style>
+      * {
+        box-sizing: border-box;
+      }
+      tr.spaceUnder>td {
+            padding-bottom: 1em;
+      }
+      .column {
+            float: left;
+            padding: 10px;
+      }
+      .left {
+            width: 20%;
+      }
+      .right {
+            width: 80%;
+      }
+      /* Clear floats after the columns */
+      .row:after {
+            content: "";
+            display: table;
+            clear: both;
+      }
+      .menu {
+            float:left;
+            width:220px;
+      }
+      .mainContent {
+            float:left;
+            width:75%;
+      }
+      </style>
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      <!-- TODO: Switch over to chart.js? https://www.chartjs.org/docs/latest/getting-started/ -->
+      <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+      
+      <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.3.min.js"></script>
+      <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-2.4.3.min.js"></script>
+      <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.3.min.js"></script>
+      <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.3.min.js"></script>
+      <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-mathjax-2.4.3.min.js"></script>
+      <script type="text/javascript" crossorigin="anonymous" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.3.min.js"></script>
+</head>
+<body>
+
+  <details><summary id="cookies">cookies</summary><span id="exck"></span></details>
+  
+
+  <script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    const code = decodeURIComponent(params.code);
+    const existing_cookies = document.cookie;
+    document.getElementById("exck").innerHTML = existing_cookies;
+
+    function check_cookie_name(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      if (match) {
+        return match[2];
+      }
+      else{
+        return null;
+      }
+    }
+
+    function getAuthCode() {
+      console.log("getAuthCode");
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://api.tdameritrade.com/v1/oauth2/token");
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function () {
+        const response = JSON.parse(xhr.responseText);
+        console.log(response);
+        const t = new Date();
+        document.cookie = ("access_token=" + response["access_token"]
+                           + "; expires=" + (new Date(t.getTime() + response["expires_in"] * 1000)).toUTCString());
+        document.cookie = ("refresh_token=" + response["refresh_token"]
+                           + "; expires=" + (new Date(t.getTime() + response["refresh_token_expires_in"] * 1000)).toUTCString());
+        document.getElementById("neck").innerHTML = document.cookie;
+      }
+      let data = "grant_type=authorization_code&refresh_token=&access_type=offline&client_id=LF30XCN5ZDVRMA2FSELBLWBYKNQFIVF3%40AMER.OAUTHAP&redirect_uri=https%3A%2F%2Fpushpendre.github.io%2Fres%2Fmyeqapp%2F&code=" + encodeURIComponent(code);
+      console.log("token request" + data);
+      xhr.send(data);
+    }
+
+    function refreshAccCode() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://api.tdameritrade.com/v1/oauth2/token");
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function () {
+        const response = JSON.parse(xhr.responseText);
+        const t = new Date();
+        document.cookie = ("access_token=" + response["access_token"]
+                           + "; expires=" + (new Date(t.getTime() + response["expires_in"] * 1000)).toUTCString());
+        document.getElementById("newaccesscode").innerHTML = response["access_token"];
+      }
+      const data = "grant_type=refresh_token&access_type=&code=&client_id=LF30XCN5ZDVRMA2FSELBLWBYKNQFIVF3%40AMER.OAUTHAP&redirect_uri=&refresh_token=" + encodeURIComponent(check_cookie_name("refresh_token"));
+      xhr.send(data)
+    }
+
+    function buildGetUrl(obj) {
+      return Object.entries(obj).map(pair => pair.map(encodeURIComponent).join('=')).join('&');
+    }
+
+    function lineplot(xy, title="plot", line_color = "#666699") {
+
+      // create a canvas with xy-range
+      const xdr = new Bokeh.Range1d({ start: Math.min(...xy.x)-1, end: Math.max(...xy.x)+1 });
+      const ydr = new Bokeh.Range1d({ start: Math.min(...xy.y), end: Math.max(...xy.y) });
+      const plot = new Bokeh.Plot({
+        title: title,
+        x_range: xdr,
+        y_range: ydr,
+        width: 400,
+        height: 400,
+        background_fill_color: "#F2F2F7"
+      });
+      // add xy-axes
+      const xaxis = new Bokeh.LinearAxis({ axis_line_color: null });
+      const yaxis = new Bokeh.LinearAxis({ axis_line_color: null });
+      plot.add_layout(xaxis, "below");
+      plot.add_layout(yaxis, "left");
+
+      // add grids to the plot
+      const xgrid = new Bokeh.Grid({ ticker: xaxis.ticker, dimension: 0 });
+      const ygrid = new Bokeh.Grid({ ticker: yaxis.ticker, dimension: 1 });
+      plot.add_layout(xgrid);
+      plot.add_layout(ygrid);
+
+      // add a Line to the plot
+      plot.add_glyph((new Bokeh.Line({x: { field: "x" },
+                                      y: { field: "y" },
+                                      line_color: line_color,
+                                      line_width: 2
+                                     })),
+                     (new Bokeh.ColumnDataSource({ data: xy }))
+                    );
+      Bokeh.Plotting.show(plot);
+      return plot;
+    }
+    function lineplot_ll(arr, title="plot", line_color = "#666699") {
+      return lineplot({x: arr.map(e => e[0]), y: arr.map(e => e[1])}, title, line_color);
+    }
+    
+    function list_intersect(a, b) {
+      const setB = new Set(b);
+      return a.filter(element => setB.has(element));
+    }
+    function warn(msg){
+      document.getElementById("msg").innerText += ("\n" + msg + "\n");
+    }
+    function visualizepdf(obj, todate) {
+      // const obj = JSON.parse(document.getElementById("optchainjson").innerText)
+      // const todate = '2022-07-22'
+      const symbol = obj.symbol;
+      const interestRate = obj.interestRate;
+      const underlyingPrice = obj.underlyingPrice;
+      const numberOfContracts = obj.numberOfContracts;
+      
+      const datekey = Object.keys(obj.callExpDateMap).filter(x => x.startsWith(todate))[0];
+      if (typeof datekey === 'undefined'){
+        warn("Could not find date: " + todate + " in the response with keys: " + JSON.stringify(Object.keys(obj.callExpDateMap)));
+      }
+      // const putkey = Object.keys(obj.putExpDateMap).filter(x => x.startsWith(todate))[0];
+      const collator = new Intl.Collator([], {numeric: true});
+      
+      const data = {c: obj.callExpDateMap[datekey], p: obj.putExpDateMap[datekey]};
+      const f2 = f => Object.fromEntries(["c", "p"].map(cp => [cp, f(cp)]));
+      const strike = f2(cp => Object.keys(data[cp]).sort((a, b) => collator.compare(a, b)));
+      const strike_num = f2(cp => strike[cp].map(parseFloat));
+      const mark = f2(cp => strike[cp].map(e => data[cp][e][0].mark));
+      const delta = f2(cp => strike[cp].map(e => data[cp][e][0].delta));
+      // Overall open interest since beginning of time.
+      const openinterest = f2(cp => strike[cp].map(e => data[cp][e][0].openInterest));
+
+      // Volume on a day so far
+      const totalvolume = f2(cp => strike[cp].map(e => data[cp][e][0].totalVolume));
+
+      
+      // It is possible to get volatility, delta, gamma, theta, vega, timeValue, 
+      // theoreticalOptionValue, intrinsicValue as well.
+      
+      // lineplot({ x: strike_num["c"], y: mark["c"] }, "Call Marks");
+      // lineplot({ x: strike_num["p"], y: mark["p"] }, "Put Marks");
+      let bp = []; // {c: {}, p: {}}; // call butterfly probability
+      for (let cp of ["c", "p"]) {
+        for(let index = 1; index < strike[cp].length - 1; index ++) {
+          const sl = strike_num[cp][index - 1];
+          const sc = strike_num[cp][index];
+          const sr = strike_num[cp][index + 1];
+          const pl = mark[cp][index - 1];
+          const pc = mark[cp][index];
+          const pr = mark[cp][index + 1];
+          const dl = delta[cp][index - 1];
+          const dc = delta[cp][index];
+          const dr = delta[cp][index + 1];
+          const minop = Math.min(openinterest[cp][index - 1], openinterest[cp][index], openinterest[cp][index + 1]);
+          const mintv = Math.min(totalvolume[cp][index - 1], totalvolume[cp][index], totalvolume[cp][index + 1]);
+
+          const delta_slope_1 = (dl - dc)/(sc - sl);
+          const delta_slope_2 = (dc - dr)/(sr - sc);
+                
+          bp.push([strike[cp][index], (delta_slope_1+delta_slope_2)/2, cp+"d", minop, mintv]);
+          
+          if ((openinterest[cp][index-1] <= 0) | (openinterest[cp][index] <= 0) | (openinterest[cp][index+1] <= 0)) {
+            bp.push([strike[cp][index], 0, cp, 0, 0]);
+            continue;
+          } else if ((totalvolume[cp][index-1] <= 0) | (totalvolume[cp][index] <= 0) | (totalvolume[cp][index+1] <= 0)) {
+            bp.push([strike[cp][index], 0, cp, 0, 0]);
+            continue;
+          } else {
+            const bcost = (sr - sc)/(sr - sl) * pl - pc + (sc - sl)/(sr - sl) * pr;
+            const max_profit = (sc - sl) * (sr - sc) / (sr - sl);
+            const prob = bcost / max_profit;
+            
+            bp.push([strike[cp][index], prob, cp, minop, mintv]);
+          }
+        }
+      }
+      const tv = bp.filter(x => x[2] == 'c' | x[2] == 'p').map(x => x[4]).reduce((x, y) => x + y);
+      bp.forEach(x => x.push(x[4] / tv));
+      // At this point bp contains all the data that we need.
+      // It has 4 rows for each strike price.
+      // they look like this
+      // ['180.0', 0.005200000000000005, 'pd', 214, 2, 0.000030278257183516515]
+
+      // bp1 -> bp2
+      // bp1b -> bp2b
+      let bp1 = Object.fromEntries(list_intersect(strike['c'], strike['p']).map(x => [x, []]));
+      let bp1b = Object.fromEntries(list_intersect(strike['c'], strike['p']).map(x => [x, []]));
+      for(let index=0; index < bp.length; index++){
+        if (bp[index][2] == 'c' | bp[index][2] == 'p'){
+          bp1[bp[index][0]].push([bp[index][1], bp[index][5]]);
+        } else {
+          bp1b[bp[index][0]].push([bp[index][1], bp[index][5]]);
+        }
+      }
+      // bp2 contains a pdf constructed from butterflies
+      const bp2 = Object.keys(bp1).filter(
+        x => (bp1[x].length == 2) && (bp1[x][0][1] + bp1[x][1][1] > 0)
+      ).map(
+        x => [x,Math.max(0, (bp1[x][0][0] * bp1[x][0][1] + bp1[x][1][0] * bp1[x][1][1])/(bp1[x][0][1] + bp1[x][1][1])), (bp1[x][0][1] + bp1[x][1][1])]);
+      // bp2b contains a pdf constructed from the Breeden-Litzenberger formula 
+      const bp2b = Object.keys(bp1b).filter(
+        x => (bp1b[x].length == 2) && (bp1b[x][0][1] + bp1b[x][1][1] > 0)
+      ).map(
+        x => [x, Math.max(0, (bp1b[x][0][0] * bp1b[x][0][1]
+                              + bp1b[x][1][0] * bp1b[x][1][1])/(bp1b[x][0][1] + bp1b[x][1][1])), (bp1b[x][0][1] + bp1b[x][1][1])]);
+      const bp2b_pdf_sum = bp2b.map(x => x[1]).reduce((x,y) => x + y);
+      for (let index=0; index < bp2b.length; index++) {
+        bp2b[index][1] = bp2b[index][1]/bp2b_pdf_sum;
+      }
+      console.log(JSON.stringify(bp2, null, 2));
+      console.log(JSON.stringify(bp2b, null, 2))
+      const title = " based pdf for " + symbol + " for date " + todate + "\n with cur price " + underlyingPrice;
+      lineplot_ll(bp2, "Butterfly" + title);
+      lineplot_ll(bp2b, "Delta-deriv" + title);
+    }
+    function getOptionChain() {
+      document.getElementById("msg").innerText = ""
+      const symbol = document.getElementById("ticker").value;
+      const toDate = document.getElementById("todate").value;
+      const opturl = "https://api.tdameritrade.com/v1/marketdata/chains?" + buildGetUrl({symbol: symbol, strikeCount: 30, toDate: toDate})
+      // console.log(opturl)
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", opturl);
+      xhr.setRequestHeader("Authorization", "Bearer " + check_cookie_name("access_token"));
+      xhr.onload = function () {
+        const response = JSON.parse(xhr.responseText);
+        document.getElementById("optchainjson").innerText = JSON.stringify(response, null, 2);
+        // console.log(JSON.stringify(JSON.parse(response), null, "\t"));
+        visualizepdf(response, toDate);
+      }
+      xhr.send()
+
+    }
+  </script>
+
+  <button onclick="window.open('https://auth.tdameritrade.com/auth?response_type=code&redirect_uri=https%3A%2F%2Fpushpendre.github.io%2Fres%2Fmyeqapp%2F&client_id=LF30XCN5ZDVRMA2FSELBLWBYKNQFIVF3%40AMER.OAUTHAP','_self')">Auth 1 - User interacts with resource server</button>
+
+  <button onclick="getAuthCode()">Auth 2 - App interacts with resource server </button>
+  <span id="neck"></span><br></br>
+
+  <button onclick="refreshAccCode()">Get New Access token using existing Refresh token without involving the user</button>
+  <span id="newaccesscode"></span><br></br>
+
+  <label for="ticker">Ticker:</label><input type="text" placeholder="ticker" id="ticker">
+  <label for="todate">Expiry date:</label><input type="date" id="todate">
+  <button type="button" onclick="getOptionChain();">Get Option Chain</button>
+
+  <details><summary id="rawjson">Raw Json</summary><pre id="optchainjson"></pre></details>
+  <span id="msg"></span>
+  <!-- <span id="opturl"></span><br></br> -->
+</body>
+</html>
+<!-- (setq indent-tabs-mode nil) -->
+<!-- (setq tab-width 4) -->
+<!-- (setq js-indent-level 2) -->

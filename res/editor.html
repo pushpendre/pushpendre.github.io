@@ -20,23 +20,20 @@
       var useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
       tinymce.init({
         // Mathjax config start
-        external_plugins: {'mathjax': '/res/tinymce-mathjax/plugin.min.js'},
+        external_plugins: {mathjax: '/res/tinymce-mathjax/plugin.js'},
         mathjax: {
-          lib: '/res/mathjax-es5-v3-2-2/tex-mml-chtml.js', //required path to mathjax
-          symbols: {start: '\\(', end: '\\)'}
-          // className: "math-tex", //optional: mathjax element class
-          // configUrl: '/res/tinymce-mathjax/config.js' //optional: mathjax config js
+          lib: '/res/mathjax-es5-v3-2-2/tex-mml-svg.js'
         }, 
         // Mathjax config end
         selector: '#mytextarea',
         plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount textpattern noneditable help charmap quickbars emoticons',
-        imagetools_cors_hosts: ['picsum.photos'],
+        // imagetools_cors_hosts: ['picsum.photos'],
         menubar: 'file edit view insert format tools table help',
         toolbar: 'mathjax | undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
         toolbar_sticky: true,
         quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
         toolbar_mode: 'sliding',
-        contextmenu: 'link image imagetools table',
+        contextmenu: 'link image table',
         skin: useDarkMode ? 'oxide-dark' : 'oxide',
         content_css: useDarkMode ? 'dark' : 'default',
         image_caption: true,
