@@ -547,6 +547,71 @@ End Function </code></pre>
       <p>First compile a pdf, either in overleaf, or using latexmk, then add all the assets, the .tex and .pdf file to res/trivia folder.
       Then add the iframe with src, loading, width, height attributes.</p>
 </details>
+<details><summary>The optimization landscape</summary>
+<p><strong>The optimization landscape </strong></p>
+<p>(<a href="https://math.stackexchange.com/questions/486400/help-me-organize-these-concepts-kkt-conditions-and-dual-problem" target="_blank" rel="noopener">another person's attempt</a>, <a href="https://fmin.xyz/" target="_blank" rel="noopener">another attempt</a>)</p>
+<p>There are two kinds of optimization problems, unconstrained and constrained. Both of these two types of problems have their own conditions for optimality, the conditions for optimality may be first order or second order and they may be necessary or sufficient. These get further subdivided into differentiable or nondifferentiable objective. Further subdivision is possible on the basis of whether the equality/inequality constraints are linear or affine or quadratic or conic etc.&nbsp;</p>
+<table style="border-collapse: collapse; width: 99.9981%;" border="1">
+<tbody>
+<tr>
+<td style="width: 48.7089%;">
+<p>Differentiable (convex or otherwise)</p>
+<ul>
+<li>Unconstrained
+<ul>
+<li>First order - gradient is zero</li>
+<li>Second order - hessian is positive definite</li>
+</ul>
+</li>
+<li>Constrained<br>
+<ul>
+<li>First Order - linear independent active constraint (qualification) + KKT <em>( lagrangian's grad = 0, feasibility, complementarity)</em></li>
+<li>Second Order -&nbsp;</li>
+</ul>
+</li>
+</ul>
+</td>
+<td style="width: 48.7089%;">
+<p>Nondifferentiable / Convex</p>
+<ul>
+<li>&nbsp;Unconstrained
+<ul>
+<li>First order - subdifferential contains 0.</li>
+<li>Second order -&nbsp;</li>
+</ul>
+</li>
+<li>Constrained
+<ul>
+<li>First Order -&nbsp;</li>
+<li>Second Order&nbsp;</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Now we can have a number of convex optimization algorithms, and these algorithms may either produce a good iterate at any point during the iteration, or at the last iterate.</p>
+<ol>
+<li>Steepest descent - Keep picking the smallest norm subgradient, which we can find by projecting 0 onto the subdifferential, and then line searching. This has the nice effect that we make guaranteed progress at every step.</li>
+<li>Follow any subgradient - Unfortunately this wont be a descent algorithm. But we are provably going to get closer to the true solution in parameter space !</li>
+<li>Projected subgradient method for constrained optimization -&nbsp;</li>
+<li>Cutting plane methods - keep making a better and better linear model of the true optimization problem. The key observation is that minimizing the maxima of multiple LPs is also an LP. Solving the maxima of LPs is called the master problem.
+<ol>
+<li>Bundle method - Instead of solving the master problem, solve a regularized master-subproblem that adds a regularization to keep the new iterate close to the old one.</li>
+<li>Trust region method</li>
+</ol>
+</li>
+</ol>
+<p><strong>Basic properties of the subgradient, subdifferential, and directional derivative</strong></p>
+<ol>
+<li>Directional derivatives are one-sided limits (not two-sided). Directional derivatives always exist for convex functions.</li>
+<li>Subgradient is a <span style="text-decoration: underline;">linear-underestimator</span> of a convex function. <strong>Note</strong> that both the direction as well as the norm of the subgradient matters.&nbsp;</li>
+<li>Subdifferential are closed-convex sets. We get a new subdifferential at each point, and if a point is in the interior of the domain of a convex function then the corresponding subdifferential is&nbsp;<strong>compact! </strong>which means it cannot be a cone! Also shrinking a subgradient by multiplying with a small scalar and then taking a step may not help, because a shrunk-vector may not lie in the subdifferential because 0 may not be in the subdifferential.</li>
+<li>The directional-derivative in direction <span class="math-tex">\( d \)</span> is lower bounded by <span class="math-tex">\( \sup_{g \in \partial f(x)} g^T d \)</span> and the steepest descent direction is the one that minimizes the directional derivative which is negative of the minimum norm element of the subdifferential.</li>
+</ol>
+<p>&nbsp;</p>
+</details>
 <details><summary>The distribution of many-to-one functions of random variables</summary>
 <p>The formula for change of distribution under one-to-one differentiable maps is well-known. If <span class="math-tex">\( f \)</span> maps <span class="math-tex">\( x \)</span> to <span class="math-tex">\( y \)</span> then <span class="math-tex">\( p_Y(y) = p_X(f^{-1}(y)) abs(det( jac_{f^{-1}}( y )) \)</span>. However what happens in the more general case where let's say that the function is not invertible ? This can happen in situations like Z = X/Y or Z = X + Y etc. In such situations the most clean method is to compute the probability of the event underlying the CDF and then differentiating. Basically</p>
 <p><span class="math-tex">\[ \begin{align}p_Z(z) &amp;= \frac{d}{dz} \int_{\mathbf{x}} \mathbb{I}[f(\mathbf{x}) &lt; z] \ p_{\mathbf{X}}(\mathbf{x}) d\mathbf{x} = \frac{d}{dz} \int_{\mathbb{I}[f(\mathbf{x}) &lt; z]}  \ p_{\mathbf{X}}(\mathbf{x}) d\mathbf{x}
