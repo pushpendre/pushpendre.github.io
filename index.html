@@ -105,7 +105,27 @@
 <!--  <details>
             <summary> XXX </summary>
             <p><pre><code> YYYY </code></pre>
-      </details> -->
+</details> -->
+
+      <details>
+            <summary> Simplify a jupyter notebook </summary>
+            <p><pre class="language-python"><code>import json
+j = json.load(open('input.ipynb'))
+
+to_del = []
+for ic, c in enumerate(j["cells"]):
+    if c["cell_type"] == "code":
+        for io, o in enumerate(c["outputs"]):
+            if o["output_type"] == "stream" and o["name"] == "stderr":
+                to_del.append((ic, io))
+
+for ic, io in sorted(to_del, reverse=True):
+    del j["cells"][ic]["outputs"][io]
+
+with open('simplified.ipynb', 'w') as f:
+    json.dump(j, f)</code></pre>
+<p>&nbsp;</p></pre>
+      </details>
       <details>
             <summary> Easily update configuration in a long running python process. </summary>
             <pre><code> """
