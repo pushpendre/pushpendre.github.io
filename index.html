@@ -106,6 +106,70 @@
             <summary> XXX </summary>
             <p><pre><code> YYYY </code></pre>
 </details> -->
+	
+<details>
+<summary> Parsing using a grammar (abstraction + latent variables) vs actions on a stack </summary>
+<p><a href="https://leetcode.com/problems/mini-parser/">https://leetcode.com/problems/mini-parser/</a>&nbsp;</p>
+
+<pre>
+<code class="language-python">    
+def iol_parser(string, start, brackets):
+    if string[start] == '[':
+        eol = brackets[start]
+        return listarg_parser(string, start + 1, eol - 1, brackets), eol + 1
+    else:
+        # print(string[start:])
+        idx = start
+        while idx &lt; len(string) and string[idx] != ',' and string[idx] != ']':
+            idx += 1
+        
+        return int(string[start : idx]), idx
+
+def listarg_parser(string, start, end, brackets):
+    arg, argend = iol_parser(string, start, brackets)
+    args = [arg]
+    # print(arg)
+    while argend &lt; end:
+        arg, argend = iol_parser(string, argend + 1, brackets)
+        args.append(arg)
+    return args
+
+class Solution:
+    def deserialize(self, s: str) -&gt; NestedInteger:
+        stack = []
+        brackets = {}
+        for i, e in enumerate(s):
+            if e == '[':
+                stack.append(i)
+            elif e == ']':
+                brackets[stack.pop()] = i
+        ret = iol_parser(s, 0, brackets)[0]
+        #print(ret)
+        return NestedInteger(ret)
+                </code></pre>
+
+<p>versus&nbsp;</p>
+
+<pre>
+<code class="language-python">class Solution:
+    def deserialize(self, s):
+        stack, num, last = [], "", None
+        for c in s:
+            if c.isdigit() or c == "-": num += c
+            elif c == "," and num:
+                stack[-1].add(NestedInteger(int(num)))
+                num = ""
+            elif c == "[":
+                elem = NestedInteger()
+                if stack: stack[-1].add(elem)
+                stack.append(elem)
+            elif c == "]":
+                if num:
+                    stack[-1].add(NestedInteger(int(num)))
+                    num = ""
+                last = stack.pop()
+        return last if last else NestedInteger(int(num))</code></pre>
+</details>
 <details>
 <summary> Some Graph Algorithms </summary>
 <p><big>Some Graph Algorithms</big></p>
