@@ -222,6 +222,65 @@ class Solution:
                     num = ""
                 last = stack.pop()
         return last if last else NestedInteger(int(num))</code></pre>
+	
+<p>Another example is in this problem, Given an encoded string in form of&nbsp;<code>&quot;ab[cd]{2}def&quot;</code>&nbsp;return decoded string&nbsp;<code>&quot;abcdcddef&quot;. </code>The recursive solution is as follows</p>
+
+<pre>
+<code class="language-python">from collections import deque
+
+def parse(s, start, end, brackets):
+    idx = start
+    builder = []
+    while idx &lt; end:
+        c = s[idx]
+        if c == '[':
+            int_start = brackets[idx] + 2
+            int_len = s[int_start:].index('}')
+            integer = int(s[int_start : int_start + int_len])
+            builder.append(
+                parse(s, idx + 1, brackets[idx], brackets) * integer
+            )
+            idx = brackets[idx] + 2 + int_len + 1
+        else:
+            builder.append(c)
+            idx += 1
+    return ''.join(builder)
+
+def decodeString2(s: str) -&gt; str:
+        brackets = {}
+        stack = []
+        for i, c in enumerate(s):
+            if c == '[':
+                stack.append(i)
+            if c == ']':
+                brackets[stack.pop()] = i
+        return parse(s, 0, len(s), brackets)</code></pre>
+
+<p>The stack based solution is a lot shorter, even though it&#39;s a little bit harder to come up with --</p>
+
+<pre>
+<code class="language-python">def decodeString(s):
+    stk = []
+    cur = ""
+    num = 0
+    for ch in s:
+        if ch.isdigit():
+            num = num*10 + int(ch)
+        elif ch.isalpha():
+            cur += ch
+        elif ch == "(":
+            stk.append(cur)
+            cur = ""
+        elif ch == "}":
+            pre = stk.pop()
+            cur = pre + cur*num
+            num = 0
+    
+    while stk:
+        cur = stk.pop() + cur
+    return cur</code></pre>
+
+
 </details>
 <details>
 <summary> Some Graph Algorithms </summary>
