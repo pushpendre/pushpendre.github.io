@@ -103,10 +103,63 @@
 
 <h2>Code Snippets</h2>
 <!--  <details>
-            <summary> XXX </summary>
-            <p><pre><code> YYYY </code></pre>
+<summary> X </summary>
+<p><pre><code> Y </code></pre>
 </details> -->
-	
+<details>
+<summary> Problem dependent reparameterization of a knapsack problem for asymptotic efficiency </summary>
+<h3>Problem dependent reparameterization of a knapsack problem for asymptotic efficiency</h3>
+
+<p>Consider the following problem</p>
+
+<table border="1" cellpadding="5" cellspacing="1">
+	<tbody>
+		<tr>
+			<td>We want to schedule some long-running tasks on two servers, a paid one and a free one. A task can be run on the free server only if some task is already running on the paid server.&nbsp;The i<sup>th</sup>&nbsp;task takes&nbsp;<em>time[i]</em>&nbsp;units of time and costs cost[i] dollars&nbsp;to complete on the paid-server, but the free server is magical because any task takes 0-cost and a single unit of time to complete on the free server<em>. </em>Find minimum cost to complete all the tasks.</td>
+		</tr>
+	</tbody>
+</table>
+
+<p>We can formalize this problem by letting&nbsp;<span class="math-tex">\(b_i \in {0, 1}\)</span>denote whether task i is assigned to paid server or not. Let <span class="math-tex">\(b \in \{0, 1\}^n\)</span>&nbsp;be the vector collecting all the b_i. Then the cost paid is&nbsp;<span class="math-tex">\(c^Tb\)</span>&nbsp;and the constraint is that&nbsp;<span class="math-tex">\(t^Tb \ge n - 1^Tb\)</span>, that is the time spent on paid servers must be greater than&nbsp;<span class="math-tex">\(\sum_{i=1}^n (1 - b_i) = n - 1^Tb\)</span>. So the problem to solve is&nbsp;</p>
+
+<p style="text-align:center"><big><span class="math-tex">\(
+\min c^Tb \text{ such that } (t+1)^T b \ge n, b \in \{0, 1\}^n \qquad\qquad - (1)\)</span></big></p>
+
+<p>Now this problem is very closely related to the 0-1 knapsack problem as follows. Let&nbsp;<span class="math-tex">\(b' = 1 - b\)</span>&nbsp;then we are trying to find&nbsp;</p>
+
+<p style="text-align:center"><big><span class="math-tex">\(\displaystyle\begin{align} &amp;\min c^T( 1 - b') \text{ such that } (t+1)^T ( 1 - b') \ge n, b' \in \{0, 1\}^n\\&amp; \equiv c^T1
+- (\max c^Tb' \text{ such that } (t + 1)^Tb' \le t^T1)
+
+\end{align}\)</span></big></p>
+
+<p>so one could in theory just run a standard knap-sack solver with inputs (cost vector, time vector + 1, total time required) but DP algorithms for knapsack run in pseudo-polynomial time&nbsp;<span class="math-tex">\(\mathscr{O}(n  W)\)</span>&nbsp;and here W will be equal to&nbsp;total time required. But in the original problem (1) the constraint was exactly&nbsp;<span class="math-tex">\(n\)</span>&nbsp;so actually if we write a DP specifically for this use-case then we can create an&nbsp;<span class="math-tex">\(\mathscr{O}(n ^2)\)</span>&nbsp;algorithm!&nbsp;</p>
+
+<p>So we can see that reformulating/reducing an optimization problem to fit a standard formulation can increase/decrease the runtime of the solution.</p>
+
+<pre>
+<code class="language-python">def P(i, k, cost, time, table):
+    ret = None
+    if (i, k) in table:
+        return table[i, k]
+    elif k &lt;= 0:
+        ret = 0
+    elif i == 1:
+        ret = float('inf') if time[0] + 1 &lt; k else cost[0]
+    else:
+        ret = min(P(i - 1, k, cost, time, table),
+                  P(i - 1, k - time[i - 1] - 1, cost, time, table) + cost[i - 1])
+    table[i,k] = ret
+    return ret
+
+def getMinCost(cost, time):
+    table = {}
+    n = len(cost)
+    val = None
+    for i in range(1, n+1):
+        for k in range(0, n+1):
+            val = P(i, k, cost, time, table)
+    return val</code></pre>
+</details>
 <details>
 <summary> Parsing using a grammar (abstraction + latent variables) vs actions on a stack </summary>
 <p><a href="https://leetcode.com/problems/mini-parser/">https://leetcode.com/problems/mini-parser/</a>&nbsp;</p>
