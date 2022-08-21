@@ -9,5 +9,5 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.uiColor = '#AADC6E';
   config.mathJaxLib = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML';
   config.height = 500;
-  // config.extraPlugins = 'codesnippet';
+  config.extraPlugins = 'notification,crossreference';
 };
