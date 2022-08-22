@@ -36,6 +36,8 @@
       }
       </style>
       <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <link href="/res/ck/plugins/prism/lib/prism/prism_patched.min.css" rel="stylesheet">
+      <script src="/res/ck/plugins/prism/lib/prism/prism_patched.min.js"></script>
       <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
       <script>hljs.initHighlightingOnLoad();</script>
       <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
@@ -1266,7 +1268,7 @@ f^\vee = \frac{1}{2} \begin{bmatrix} f_{32} - f_{23}\\ f_{13} - f_{31} \\ f_{21}
 0 &amp; 0 &amp; 1 \\
 0 &amp; 0 &amp; 0 \\
 -1 &amp; 0 &amp; 0 \\
-\end{pmatrix} + \gamma 
+\end{pmatrix} + \gamma
 \begin{pmatrix}
 0 &amp; -1 &amp; 0 \\
 1 &amp; 0 &amp; 0 \\
@@ -1279,12 +1281,12 @@ f^\vee = \frac{1}{2} \begin{bmatrix} f_{32} - f_{23}\\ f_{13} - f_{31} \\ f_{21}
 \cos(\text{angle-Z}) &amp; -\sin(\text{angle-Z}) &amp; 0 \\
 \sin(\text{angle-Z}) &amp; \cos(\text{angle-Z}) &amp; 0 \\
 0 &amp; 0 &amp; 1 \\
-\end{pmatrix}  \text{ and } 
+\end{pmatrix}  \text{ and }
 \begin{pmatrix}
 \cos(\text{angle-Y}) &amp; 0 &amp; \sin(\text{angle-Y}) \\
 0 &amp; 1 &amp; 0 \\
 -\sin(\text{angle-Y}) &amp; 0 &amp; \cos(\text{angle-Y}) \\
-\end{pmatrix}  \text{ and } 
+\end{pmatrix}  \text{ and }
 \begin{pmatrix}
 1 &amp; 0 &amp; 0 \\
 0 &amp; \cos(\text{angle-X}) &amp; -\sin(\text{angle-X}) \\
@@ -1297,7 +1299,7 @@ f^\vee = \frac{1}{2} \begin{bmatrix} f_{32} - f_{23}\\ f_{13} - f_{31} \\ f_{21}
 
 <p>This can be verified/tested using the following code, so rodrigues gives us a crazy identity that seems kind of unbelievable ! And it turns out that the formula for the exponential map is even more simple if we are mapping to a quaternion.</p>
 
-<p style="text-align:center"><big><span class="math-tex">\(\displaystyle \exp(\omega) \equiv \begin{cases}(1,0,0,0)^T &amp;\text{ if } \omega = (0,0,0)\\ 
+<p style="text-align:center"><big><span class="math-tex">\(\displaystyle \exp(\omega) \equiv \begin{cases}(1,0,0,0)^T &amp;\text{ if } \omega = (0,0,0)\\
 \big( \cos(|\omega|/2), \sin(|\omega|/2) \,\omega / |\omega|\big)  \end{cases}\)</span></big></p>
 
 <pre>
@@ -1306,13 +1308,13 @@ import scipy.linalg
 import numpy as np
 w = [1, 2, 3]
 x,y,z = w
-w_wedge = [[0, -z, y], [z, 0, -x], [-y, 
+w_wedge = [[0, -z, y], [z, 0, -x], [-y,
 w_wedge = np.array(w_wedge)
 theta = np.linalg.norm(w)
 # lhs requires 1.86e-4s to compute
 lhs = scipy.linalg.expm(w_wedge)
 # rhs requires 1.61e-5s to compute!
-rhs = (np.eye(3) 
+rhs = (np.eye(3)
   + np.sin(theta) / theta * w_wedge
   + (1 - np.cos(theta)) / theta / theta * w_wedge @ w_wedge)
 np.testing.assert_allclose(lhs, rhs)
