@@ -109,6 +109,26 @@
 <p><pre><code> Y </code></pre>
 </details> -->
 <details>
+<summary> Quick and dirty experiment tracker </summary>
+<pre>
+ <code class="language-bash">cx () {
+    # zip -rv zipfile.zip newfile.txt newfile1.txt
+    local tarfile=code.$RANDOM.$(date "+%Y-%m-%d-%H-%M-%S").tar
+    local logfile=$tarfile.log
+    echo checkpointing code to $tarfile | tee -a $logfile
+    tar cvf $tarfile *.py *.sh *.txt *.yml
+    echo saved code to $tarfile | tee -a $logfile
+    echo "$@" | tee -a $logfile
+    $@ 2&gt;&amp;1 | tee -a $logfile
+    echo reminder that we saved code to $tarfile | tee -a $logfile
+    echo adding logfile $logfile to $tarfile | tee -a $logfile
+    tar rvf $tarfile $logfile
+    mv $logfile /tmp/
+}
+</code></pre>
+
+</details>
+<details>
 <summary> Problem dependent reparameterization of a knapsack problem for asymptotic efficiency </summary>
 <h3>Problem dependent reparameterization of a knapsack problem for asymptotic efficiency</h3>
 
