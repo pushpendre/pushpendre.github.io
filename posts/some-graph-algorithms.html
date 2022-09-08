@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title></title>
+      <link rel="stylesheet" href="/res/mystylesheet.css">
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <link rel="stylesheet" href="/res/ck/plugins/prism/lib/prism/prism_patched.min.css">
+      <script src="/res/ck/plugins/prism/lib/prism/prism_patched.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
+      <script src="/res/mathjax-es5-v3-2-2/tex-mml-chtml.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<p><strong>General BFS</strong></p>
+
+<pre>
+<code class="language-python">initialize que, set
+
+while que:
+  state, path_len = que.popleft()
+  if state meets stopping condition:
+     return path_len
+  visited.add(state)
+  for each neighbor of state:
+    if neighbor is not in visited and neighbor is acceptable:
+      que.append(neighbor)
+  
+return -1</code></pre>
+
+<h4><br />
+<u>A Specific example of a BFS Problem&nbsp;</u></h4>
+
+<p>There is a grid where a blocked cell is represented by &#39;#&#39;&nbsp;Traveling is allowed only through empty cells. People are&nbsp;required to travel from a starting cell defined by the character&nbsp;&#39;S&#39; to an ending cell represented by a character &#39;E&#39;. The&nbsp;people can jump a length of any integer k in all four directions&nbsp;from a given cell i.e. up, down, left, and right. However, if&nbsp;the jump length k is greater than 1, the next jump must be made in the same direction. For example, a hacker is allowed to jump 3 units towards the right, followed by 1 unit towards the right,&nbsp;and then 3 units towards the left. They however cannot jump 3&nbsp;units towards the right followed by 1 unit towards the left as direction change is not allowed if the previous jump was of&nbsp;length greater than 1.</p>
+
+<p>Note that the last jump in any jump sequence is always of length 1.&nbsp;</p>
+
+<p>The jump can be made over a blocked cell as well as long as&nbsp; both starting and ending cells are empty.<br />
+&nbsp;</p>
+
+<pre>
+<code class="language-python">from collections import namedtuple, deque
+state = namedtuple('state', ['i', 'j', 'dir', 'pathlength'])
+
+def getMinJumps(grid):
+    # Write your code here
+    nrow, ncol = len(grid), len(grid[0])
+    i, j = [(i,j) for i in range(nrow) for j in range(ncol) if grid[i][j] == 'S'][0]
+    que = deque([state(i, j, None, 0)])
+    visited = set()
+
+    while que:
+        cur = que.popleft()
+        # print(len(que))
+        if grid[cur.i][cur.j] == 'E' and cur.dir is None:
+            return cur.pathlength
+        vhash = state(cur.i, cur.j, cur.dir, 0)
+        visited.add(vhash)
+
+        if cur.dir == "up" or cur.dir is None:
+            for i in range(0, cur.i):
+                jump_size = abs(i - cur.i)
+                dir = None if jump_size == 1 else "up"
+                next_state = state(i, cur.j, dir, cur.pathlength + 1)
+                next_vhash = state(i, cur.j, dir, 0)
+                if next_vhash not in visited and grid[i][cur.j] != '#':
+                    que.append(next_state)
+        if cur.dir == "down" or cur.dir is None:
+            for i in range(cur.i + 1, nrow):
+                jump_size = abs(i - cur.i)
+                dir = None if jump_size == 1 else "down"
+                next_state = state(i, cur.j, dir, cur.pathlength + 1)
+                next_vhash = state(i, cur.j, dir, 0)
+                if next_vhash not in visited and grid[i][cur.j] != '#':
+                    que.append(next_state)
+
+        if cur.dir == "left" or cur.dir is None:
+            for j in range(0, cur.j):
+                jump_size = abs(j - cur.j)
+                dir = None if jump_size == 1 else "left"
+                next_state = state(cur.i, j, dir, cur.pathlength + 1)
+                next_vhash = state(cur.i, j, dir, 0)
+                if next_vhash not in visited and grid[cur.i][j] != '#':
+                    que.append(next_state)
+        if cur.dir == "right" or cur.dir is None:
+            for j in range(cur.j + 1, ncol):
+                jump_size = abs(j - cur.j)
+                dir = None if jump_size == 1 else "right"
+                next_state = state(cur.i, j, dir, cur.pathlength + 1)
+                next_vhash = state(cur.i, j, dir, 0)
+                if next_vhash not in visited and grid[cur.i][j] != '#':
+                    que.append(next_state)
+
+    return -1
+        </code></pre>
+
+<p><strong>Connected Components and Generic DFS</strong></p>
+
+<p>Executing DFS on each vertex and keeping track of nodes visited in a single run can tell us all the connected components in an undirected graph. The algorithm looks like the following</p>
+
+<pre>
+<code class="language-python">def dfs(v, graph, visited):
+  visited.add(v)
+  for nbr in graph(v):
+     if nbr not in visited:
+        dfs(v, graph, visited)
+
+ncc = 0 # n connected components
+for v in graph:
+  if v not in visited:
+    dfs(v, graph, visited)
+    ncc += 1
+</code></pre>
+
+<p>&nbsp;</p>
+
+<p><u>An example of finding connected components using DFS</u></p>
+
+<pre>
+<code class="language-python"># https://leetcode.com/problems/accounts-merge/
+
+from collections import defaultdict
+
+def dfs(idx, idx2email, email2idx, visited):
+    if idx in visited:
+        return []
+    visited.add(idx)
+    ret = [idx]
+    for email in idx2email[idx]:
+        for nbr in email2idx[email]:
+            if nbr not in visited:
+                ret.extend(dfs(nbr, idx2email, email2idx, visited))
+    return ret
+
+class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -&gt; List[List[str]]:
+        idx2email = defaultdict(list)
+        email2idx = defaultdict(list)
+        for idx, acc in enumerate(accounts):
+            idx2email[idx] = acc[1:]
+            for email in acc[1:]:
+                email2idx[email].append(idx)
+        output = []
+        visited = set()
+        for idx, acc in enumerate(accounts):
+            if idx not in visited:
+                name = acc[0]
+                tomerge = dfs(idx, idx2email, email2idx, visited)
+                visited.update(tomerge)
+                output.append([name] + sorted(set(sum([idx2email[idx] for idx in tomerge], []))))
+        return output</code></pre>
+
+<p>Note that this particular problem can be solved using a more special data-structure called the union-find datastructure.</p>
+
+<pre>
+<code class="language-python"># https://leetcode.com/problems/accounts-merge/discuss/1084738/
+class UF:
+    def __init__(self, N):
+        self.parents = list(range(N))
+    def union(self, child, parent):
+        self.parents[self.find(child)] = self.find(parent)
+    def find(self, x):
+        if x != self.parents[x]:
+            self.parents[x] = self.find(self.parents[x])
+        return self.parents[x]
+
+class Solution:
+    # 196 ms, 82.09%.
+    def accountsMerge(self, accounts: List[List[str]]) -&gt; List[List[str]]:
+        uf = UF(len(accounts))
+
+        # Creat unions between indexes
+        ownership = {}
+        for i, (_, *emails) in enumerate(accounts):
+            for email in emails:
+                if email in ownership:
+                    uf.union(i, ownership[email])
+                ownership[email] = i
+
+        # Append emails to correct index
+        ans = collections.defaultdict(list)
+        for email, owner in ownership.items():
+            ans[uf.find(owner)].append(email)
+
+        return [[accounts[i][0]] + sorted(emails) for i, emails in ans.items()]</code></pre>
+
+<p><strong>Shortest path algorithm b/w two vertices in a weighted graphs : Djikstra with early stoppi</strong><strong>ng</strong></p>
+
+<p>It is possible to find the shortest path between two vertices in an unweighted graph by using a simple BFS but in a weighted graph (with positive weights) we need to use the Djikstra&#39;s algorithm. In case of negative weights, we need to use the full-fledged flloyd warshall algorithm. Note that Djikstra&#39;s algorithm can give me the shortest path from start to all vertices as follows.&nbsp;</p>
+
+<pre>
+<code class="language-python">
+def dijkstra(adj, nodes, src):
+    dist = [float('inf') for i in range(nodes)]
+    dist[src] = 0
+    queue = [[dist[src], src]]
+    heapq.heapify(queue)
+    while len(queue) &gt; 0:
+        cur_dist, cur_node = heapq.heappop(queue)
+        if cur_dist &gt; dist[cur_node]:
+            continue
+        for neighbour, road_len in adj[cur_node]:
+            if dist[neighbour] &gt; cur_dist + road_len:
+                dist[neighbour] = cur_dist + road_len
+                heapq.heappush(queue, [dist[neighbour], neighbour])
+    return dist</code></pre>
+
+<p>&nbsp;</p>
+
+<p><strong>The Trie Datastructure</strong></p>
+
+<p>&nbsp;</p>
+
+<pre>
+<code class="language-python">class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end = False
+
+class WordDictionary:
+
+    def __init__(self):
+        self.root = TrieNode()
+
+    def addWord(self, word: str) -&gt; None:
+        root = self.root
+        for char in word:
+            if char in root.children:
+                root = root.children[char]
+            else:
+                tmp = TrieNode()
+                root.children[char] = tmp
+                root = tmp
+        root.is_end = True
+
+    def search(self, word: str, root=None) -&gt; bool:
+        if root is None:
+            root = self.root
+
+        for i, char in enumerate(word):
+            if char == ".":
+                return any(self.search(word[i+1:], r) for r in root.children.values())
+            elif char not in root.children:
+                return False
+            else:
+                root = root.children[char]
+        return root.is_end
+
+
+</code></pre>
+
+</body>
+</html>

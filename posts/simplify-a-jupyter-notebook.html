@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title></title>
+      <link rel="stylesheet" href="/res/mystylesheet.css">
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <link rel="stylesheet" href="/res/ck/plugins/prism/lib/prism/prism_patched.min.css">
+      <script src="/res/ck/plugins/prism/lib/prism/prism_patched.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
+      <script src="/res/mathjax-es5-v3-2-2/tex-mml-chtml.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<p><pre class="language-python"><code>import json
+j = json.load(open('input.ipynb'))
+
+to_del = []
+for ic, c in enumerate(j["cells"]):
+    if c["cell_type"] == "code":
+        for io, o in enumerate(c["outputs"]):
+            if o["output_type"] == "stream" and o["name"] == "stderr":
+                to_del.append((ic, io))
+
+for ic, io in sorted(to_del, reverse=True):
+    del j["cells"][ic]["outputs"][io]
+
+with open('simplified.ipynb', 'w') as f:
+    json.dump(j, f)</code></pre>
+<p>&nbsp;</p></pre>
+      </details>
+      <details>
+            <summary> Easily update configuration in a long running python process. </summary>
+            <pre><code> """
+CLI USAGE:
+python listener.py l
+python listener.py c foo bar
+"""
+
+from multiprocessing.managers import SyncManager
+from time import sleep
+import sys
+
+__config__ = {}
+
+def get_config():
+    return __config__
+
+def listener(address='/tmp/p2', authkey=b'password'):
+    SyncManager.register("get_config", get_config)
+    manager = SyncManager(address, authkey=authkey)
+    manager.start()
+    config = manager.get_config()
+    return manager, config
+
+def controller(address='/tmp/p2', authkey=b'password'):
+    SyncManager.register("get_config")
+    manager = SyncManager(address, authkey=authkey)
+    manager.connect()
+    config = manager.get_config()
+    return config
+
+
+if __name__ == '__main__':
+    if sys.argv[1] == 'l':
+        # from remote_control import listener
+        manager, config = listener()
+        while True:
+            sleep(5)
+            print(config)
+        manager.shutdown()
+    else:
+        # from remote_control import controller
+        config = controller()
+        config.update([(sys.argv[2], sys.argv[3])])
+ </code></pre>
+</body>
+</html>

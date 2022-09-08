@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title></title>
+      <link rel="stylesheet" href="/res/mystylesheet.css">
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <link rel="stylesheet" href="/res/ck/plugins/prism/lib/prism/prism_patched.min.css">
+      <script src="/res/ck/plugins/prism/lib/prism/prism_patched.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
+      <script src="/res/mathjax-es5-v3-2-2/tex-mml-chtml.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<p>Lessons from the metaseq <a href="https://arxiv.org/abs/2205.01068">paper</a> and the "Open Pre-Trained Transformer" <a href="https://github.com/facebookresearch/metaseq/tree/main/projects/OPT">project</a>. There is another paper by DeepMind called <a href="https://arxiv.org/pdf/2112.11446.pdf">Gopher</a> that I haven't read. The large scale OPT-175B model was trained on 1000, 80GB, A100 GPUs for around 34-35 days on around 180B tokens ≅ 800GB of text data. Each A100 offers 312 Teraflops and the meta system reached 147 Tflops utilization. The state of the optimizer "AdamW" is stored in FP32 format, whereas the model weights are stored in FP16 format. The different floating points have the following format.</p>
+<table style="border-collapse: collapse; width: 99.9844%;" border="1">
+<tbody>
+<tr>
+<td style="width: 48.0624%;">Format</td>
+<td style="width: 48.0624%;">(Sign=1, Range/Exponent, Precision/Mantissa)</td>
+</tr>
+<tr>
+<td style="width: 48.0624%;">FP32</td>
+<td style="width: 48.0624%;">8, 23</td>
+</tr>
+<tr>
+<td style="width: 48.0624%;">TF32</td>
+<td style="width: 48.0624%;">8, 10</td>
+</tr>
+<tr>
+<td style="width: 48.0624%;">FP16</td>
+<td style="width: 48.0624%;">5, 10</td>
+</tr>
+<tr>
+<td style="width: 48.0624%;">BF16</td>
+<td style="width: 48.0624%;">8, 7</td>
+</tr>
+</tbody>
+</table>
+<p>So the total training floating point ops were about 0.4Yotta operations. At inference time, the entire process can be sped up by 30-50% by investing in sparsifying with 2:4 sparsity.</p>
+<details>
+<summary>how to generate a structured sparse network using APEX's Automatic Sparsity library</summary>
+<pre class="language-python"><code>""" Generate a structured sparse network using APEX's Automatic Sparsity library.
+"""
+import torch
+from apex.contrib.sparsity import ASP
+device = torch.device('cuda')
+model = TheModelClass()
+model.load_state_dict(torch.load("dense_model.pth")) # Load existing model
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+ASP.prune_trained_model(model, optimizer)
+dataloader = DataLoader()
+for t in range(500):
+      optimizer.zero_grad()
+      loss = loss_fn(model(x), y)
+      loss.backward()
+      optimizer.step()
+
+torch.save(model.state_dict(), "pruned_model.pth")</code></pre>
+</details>
+<p>The batch size was 0.5M-4M and each sequence length was 2048. The total model size was 350GB and assuming that a checkpoint was made after every 1hr of work will mean that 264TB of disk space was required just to store the checkpoints. One of the cheapest cloud provider for A100 is lambdalabs that charges $1.1/hr/A100gpu so the training cost will be $892K. OTOH the acquisition cost for 1000 A100 is 11K$ * 1000 = 11M$. If one acquires 100 3090 or 3080 for personal/commercial use then <a href="https://towardsdatascience.com/another-deep-learning-hardware-guide-73a4c35d3e86">the cost can come down to 100K$</a> and the electricity-cost to run A100s which take something between 300W to 1KW will be 7.26e-2$/KW/H * 24 * 1 * 33 * 1024 = 59K$ which is 1/20th of the cloud-rent. But the 3090/3080 have smaller memory at 24/12GB instead of the 80/40GB for A100.&nbsp;</p>
+<p>In terms of algorithmic decisions the main things to decide while training large LMs are following:</p>
+<table style="border-collapse: collapse; width: 99.9844%;" border="1">
+<tbody>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;"><strong>Decision Dimensions</strong></td>
+<td style="width: 50.068%;"><strong>Specific to MetaSeq (OPT)</strong></td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Activation Function</td>
+<td style="width: 50.068%;">Relu (they weren't able to get swish to work well with Mixed Precision)</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Seq. Length</td>
+<td style="width: 50.068%;">2048</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Optimizer</td>
+<td style="width: 50.068%;">AdamW (see below)</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">LR Scheduler</td>
+<td style="width: 50.068%;">Triangular (Howard and Ruder from FastAI)</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Batch Size</td>
+<td style="width: 50.068%;">0.5 - 4M</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Gradient Clipping</td>
+<td style="width: 50.068%;">&nbsp;</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Dropout</td>
+<td style="width: 50.068%;">0.1</td>
+</tr>
+<tr>
+<td style="width: 10.2519%;">&nbsp;</td>
+<td style="width: 39.6797%;">Dynamic Loss Scaling</td>
+<td style="width: 50.068%;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p><strong>AdamW : </strong>Broadly speaking the decoupled weight decay idea is that instead of computing the momentum from the regularized loss, we compute momentum from the unregularized loss but then regularize the weight update. This was described on <a href="https://arxiv.org/pdf/1711.05101.pdf">page 3 of this paper.</a></p>
+<p><strong>Loss Scaling :&nbsp;</strong>The FP16 numbers can represent exponents ranging from -14 to 15. But usually the gradient values tend to be small in magnitude and therefore they only require negative exponents. If we scale up the loss value before backprogation, then scale back down the values (by using a small learning rate ??) before weight update/gradient clipping or any other gradient-related computations take place.</p>
+<p><strong>Timelines :&nbsp;</strong>GPT3 details were released on May 2020, FB OPT was trained around Dec 2021, and Gopher model details were released in Dec 2021. The FB team was using Azure cloud provider.</p>
+<p><strong>Automatic Mixed Precision</strong> <strong>via <a href="https://github.com/NVIDIA/apex">NVIDIA APEX</a> and <a href="https://developer.nvidia.com/blog/apex-pytorch-easy-mixed-precision-training/">AMP</a></strong> :&nbsp;</p>
+<pre class="language-python"><code># At the logical level, Amp works by employing a whitelist / blacklist model.
+# We divide the universe of functions into three sets:
+# Whitelist : Functions where we expect a speedup with FP16 math.
+# Blacklist : Functions for which 16 bits of precision may not be sufficient.
+#     so we want to ensure that inputs are in FP32, the most common examples
+#     of these are the neural net loss functions like softmax with cross entropy.
+# Everything : Treated like blacklist.
+
+from apex import amp
+model, optimizer = amp.initialize(model, optimizer)
+loss = criterion(…)
+with amp.scale_loss(loss, optimizer) as scaled_loss:
+    scaled_loss.backward()
+optimizer.step()</code></pre>
+<p><strong>Systems Stuff</strong></p>
+<p>A useful Linux Commands is <code>pdsh</code> which can do remote execution via ssh on multiple machine.&nbsp;</p>
+<p><strong>Nvidia Networking Glossary</strong></p>
+<ul>
+<li>NVIDIA NVLink enables high-speed peer-to-peer communication between GPUs within a node.</li>
+<li>Nvidia Infiniband and Ethernet support upto 200GB/s data speed for inter-node GPU comm. Infiniband is better because it has much lower latency so it can transfer "medium" sized packets quicker.</li>
+<li>RDMA -- This is naturally supported on Infiniband and is available via ROCE (RDMA over converged ethernet).&nbsp;</li>
+<li>NCCL -- NVIDIA collective communication library.</li>
+</ul>
+</body>
+</html>

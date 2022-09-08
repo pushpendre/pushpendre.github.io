@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title></title>
+      <link rel="stylesheet" href="/res/mystylesheet.css">
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <link rel="stylesheet" href="/res/ck/plugins/prism/lib/prism/prism_patched.min.css">
+      <script src="/res/ck/plugins/prism/lib/prism/prism_patched.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
+      <script src="/res/mathjax-es5-v3-2-2/tex-mml-chtml.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<p>
+Based on <a href="https://wiki.math.ntnu.no/_media/aarms2015/lectures/volumepreservation.pdf">link</a>&nbsp;and <a href="http://www.mcmchandbook.net/HandbookChapter5.pdf">link</a>.&nbsp;</p>
+
+<p>Hamiltonian dynamics operate on momentum, position vectors <span class="math-tex">\( p \in \mathbb{R}^d \text{ and } q \in \mathbb{R}^d \)</span>. The system is described by a function <span class="math-tex">\( H(p, q) \)</span> called the Hamiltonian function. This function obeys certain differential equations that arise due to symmetries and conservation laws. These differential equations are</p>
+
+<p style="text-align:center"><span class="math-tex">\[ \begin{align}\frac{dq}{dt} &amp;= \frac{\partial H}{\partial p}&amp;= \text{velocity} \\ \frac{dp}{dt} &amp;= - \frac{\partial H}{\partial q} &amp;\approx \text{force} \end{align} \]</span></p>
+
+<p>Note that these differential equations automatically mean that the hamiltonian function is <strong><span style="color:#169179">conserved/constant</span></strong> w.r.t. time because</p>
+
+<p style="text-align:center"><span class="math-tex">\[ \frac{dH}{dt} = \frac{\partial H}{\partial p} \frac{dp}{dt} + \frac{\partial H}{\partial q}\frac{dq}{dt} = \frac{dq}{dt} \frac{dp}{dt} - \frac{dp}{dt}\frac{dq}{dt} = 0 \]</span></p>
+
+<p>Also the hamiltonian is <strong><span style="color:#169179">reversible</span></strong> in time, simply by negating the time-derivative. Often we can write this hamiltonian as <strong>the sum</strong> of the kinetic plus the potential energy, i.e. <span class="math-tex">\[ H = \text{Potential}, U(q) + \text{Kinetic}, K(p) \]</span>Note that &quot;position&quot; and &quot;momentum&quot; can be replaced by made up quantities, they are &quot;formal variables&quot; of the system. E.g. when doing hamiltonian monte carlo the system is &quot;formalized&quot; as &quot;q&quot; (the position) being the random variable that we want to sample, and &quot;p&quot; being the mean-zero non-standard variance gaussian that we can sample.&nbsp;</p>
+
+<p><span style="color:#169179"><strong>Liouville&#39;s theorem of volume preservation for hamiltonian systems.</strong></span></p>
+
+<p>If we forward-execute the differential equations for a set of points in some region R of (q,p) space that has volume V, then the volume of the the image of R will also be V.&nbsp; This can be proven either by showing that the divergence of this vector field is zero (see theorem below), or by directly showing that the determinant of the jacobian matrix of the instantaneous mapping is 1 at arbitrary time t.&nbsp;</p>
+
+<p style="text-align:center"><span class="math-tex">\(\displaystyle \text{det}\Big(\text{jac}\big((q(t), p(t)) \to (q(t+\delta), p(t+\delta))\big)\Big) = 1\)</span></p>
+
+<p>The instantaneous mapping can be approximated as&nbsp;</p>
+
+<p style="text-align:center"><span class="math-tex">\(T_{\delta}(q,p) = \begin{bmatrix}q \\ p \end{bmatrix} + \delta \begin{bmatrix}dq/dt \\ dp/dt\end{bmatrix} = \begin{bmatrix}q \\ p \end{bmatrix} + \delta \begin{bmatrix}\partial H/\partial p \\ \partial H/\partial q\end{bmatrix}\)</span></p>
+
+<p>and therefore its jacobian can be written as an identity matrix (from the first [q,p] term) plus the matrix of second order partial derivatives, i.e.</p>
+
+<p style="text-align:center"><span class="math-tex">\(B_\delta = \text{jac}(T_{\delta}) = \begin{bmatrix}
+1 + \delta \frac{\partial^2H}{\partial q_j \partial p_i}
+&amp;  \delta \frac{\partial^2H}{\partial p_j \partial p_i}
+\\
+-\delta  \frac{\partial^2H}{\partial q_j \partial q_i}
+&amp; 1 -\delta \frac{\partial^2H}{\partial p_j \partial q_i}
+\end{bmatrix}\)</span>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<table align="left" border="2" cellpadding="2" cellspacing="2">
+	<thead>
+		<tr>
+			<th scope="col"><span style="color:#8e44ad"><strong>Theorem : All divergence free systems preserve volume.</strong></span></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+			<p>Let <span class="math-tex">\(D \text{ be an open and bounded subset of } \mathbb{R}^d \text{ and let }\dot{y} = f(y) \)</span>&nbsp;be a system of differential equations. The function that maps D to its image at time t is called the flow. Let&nbsp;<span class="math-tex">\(\varphi_t\)</span>&nbsp;be the flow, i.e.&nbsp;<span class="math-tex">\(D(t) = \varphi_t(D)\)</span>&nbsp; and&nbsp;<span class="math-tex">\(\text{vol}(D(t)) = \int_{D(t)} dV\)</span>. . The divergence of the gradient-vector-field&nbsp;is defined as&nbsp;<span class="math-tex">\(\displaystyle \sum_i \frac{\partial \dot{y}_i}{\partial y_i}\)</span>and this is a vector-field itself. If this divergence-verctor-field is 0 for all time then&nbsp;<span class="math-tex">\(\text{vol}(D(t)) = \text{vol}(D)\)</span>. This proof primarily relies on three facts.&nbsp;</p>
+
+			<ol>
+				<li>The divergence of a gradient-vector-field is the trace of the jacobian of the time-derivative-vector-field.</li>
+				<li><span class="math-tex">\(\text{det}(I + \epsilon A) = 1 + \epsilon\ \text{trace}(A) + \mathscr{O}(\epsilon^2)\)</span></li>
+				<li><span class="math-tex">\(\text{vol}(D(t)) \triangleq \displaystyle \int \text{det}\Big(\frac{\partial \varphi_t}{\partial y}\big) dV\)</span>&nbsp;and&nbsp;<span class="math-tex">\(\varphi_t(y) \triangleq y + t f(y) + \mathscr{O}(t^2)\)</span></li>
+			</ol>
+
+			<p>In terms of the physical intuition the divergence is kind of the instantaneous change in the strength of a vector-field&nbsp;wrt to the phase-space.</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<p><br />
+<span style="color:#169179"><strong>Symplecticness of the jacobian of the hamiltonian</strong></span></p>
+
+<p>Weyl came up with the word &quot;symplectic&quot; as a substitute for the word &quot;complex&quot;. When a system of differential equations is symplectic then that means that the jacobian matrix is a symplectic matrix, and a symplectic matrix has a type of &quot;weird&quot; skew-symmetric &quot;similarity&quot; structure.&nbsp;A symplectic matrix is a <span class="math-tex">\(2n \times 2n\)</span>&nbsp;matrix with real entries that satisfies the condition&nbsp;<span class="math-tex">\( M^T \Omega M = \Omega \)</span>&nbsp;where&nbsp;<span class="math-tex">\(\Omega\)</span>&nbsp;is a fixed nonsingular, skew-symmetric matrix. Symplectic matrices are nonsingular, they have determinant +1 and their inverse matrix can be easily found as&nbsp;<span class="math-tex">\(M^{-1} = \Omega^{-1} M^T \Omega\)</span>. They form a subgroup of the general linear group under matrix multiplication. Volume preservation under a linear operator is naturally implied by symplecticness.</p>
+
+<p>The time evolution of Hamilton&#39;s equations is a &quot;symplectomorphism&quot; because it conserved the symplectic 2-form. A 2-form is a function that measures oriented areas. A numerical scheme for the discretization of a differential equation is a symplectic integrator if it also conserves this 2-form. Most of the usual numerical methods like the Euler scheme and the Runge-Kutta scheme are&nbsp;<u>not symplectic</u>&nbsp;therefore other methods like the leap-frog method are needed. Remember that when we are doing numerical integration then the whole game is in coming up with the right sequence of discrete which will not produce compounding errors.</p>
+
+<p><span style="color:#16a085"><u><strong>For example</strong></u></span>, consider this example where the position and momentum are both 1-dim values and the kinetic energy is momentum-squared and potential energy is position-squared. Then&nbsp;</p>
+
+<p style="text-align:center">&nbsp;<span class="math-tex">\[ \frac{dq}{dt} = p, \text{ and } \frac{dp}{dt} = -q \implies \frac{d^2p}{d^2t} = -p \]</span>&nbsp;</p>
+
+<p>which means that p is a sinusoidal function. Now if we try to do numerical integration of this system of differential equations by the following scheme called the euler-scheme</p>
+
+<p style="text-align:center">&nbsp;&nbsp;<span class="math-tex">\[ \begin{align} p(t+\epsilon) := p(t) + \epsilon \dot{p} (t) = p(t) - \epsilon q(t)\\ q(t+\epsilon) = q(t) + \epsilon \dot{q}(t) = q(t) + \epsilon p(t) \end{align} \]</span>&nbsp;</p>
+
+<p>then we can see that this discretization is non-symplectic because the matrix looks like this <span class="math-tex">\( \begin{bmatrix}1 &amp; -\epsilon \\ \epsilon &amp; 1 \end{bmatrix} \)</span>which has determinant <span class="math-tex">\( 1 + \epsilon^2 \)</span> otoh if we do discretization in this manner</p>
+
+<p style="text-align:center"><span class="math-tex">\[ \begin{align} p(t+\epsilon) &amp;:= p(t) + \epsilon \dot{p} (t) &amp;&amp;= p(t) - \epsilon q(t)\\ q(t+\epsilon) &amp;= q(t) + \epsilon \dot{q}(t+\epsilon) &amp;&amp;= q(t) + \epsilon p(t+\epsilon) \end{align} \]</span></p>
+
+<p>then the transformation is <span class="math-tex">\( \begin{bmatrix}1 &amp; -\epsilon \\ \epsilon &amp; 1-\epsilon^2\end{bmatrix} \)</span> which has determinant 1 !! So this simple &quot;gibbs-sampling&quot; style sequential update does wonders. <strong><span style="color:#169179">The leapfrog method</span></strong> is even better for integrating symplectic systems because it works as follows, first do a half-update to momentum, then a full update to position, and then the remaining half update to momentum.&nbsp;</p>
+
+</body>
+</html>

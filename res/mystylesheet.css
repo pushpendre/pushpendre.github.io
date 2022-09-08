@@ -1,0 +1,35 @@
+* {
+    box-sizing: border-box;
+}
+tr.spaceUnder>td {
+    padding-bottom: 1em;
+}
+.column {
+    float: left;
+    padding: 10px;
+}
+.left {
+    width: 20%;
+}
+.right {
+    width: 80%;
+}
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.menu {
+    float:left;
+    width:220px;
+}
+.mainContent {
+    float:left;
+    width:75%;
+}
+/* https://www.w3schools.com/tags/ref_colornames.asp */
+details[open] {
+    outline: 1;
+    border: 1px solid bisque;
+}

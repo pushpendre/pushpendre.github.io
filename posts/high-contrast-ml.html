@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title></title>
+      <link rel="stylesheet" href="/res/mystylesheet.css">
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css">
+      <link rel="stylesheet" href="/res/ck/plugins/prism/lib/prism/prism_patched.min.css">
+      <script src="/res/ck/plugins/prism/lib/prism/prism_patched.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script>
+      <!-- /res/mathjax-es5-v3-2-2/tex-mml-svg.js -->
+      <script src="/res/mathjax-es5-v3-2-2/tex-mml-chtml.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<p><strong>High Contrast ML</strong></p>
+<p>&nbsp;</p>
+<p>The word contrast comes up a lot in ML. Specifically, there are</p>
+<ol>
+<li>Contrastive Loss - This loss is kind of like a siamese loss, the within-class embeddings should be close (geometrically) and the between-class embeddings should be far apart. Specifically this method minimized L2-distance between embeddings from same-class and laterally-inverted squared-hinge-loss for embeddings between classes.<br><br></li>
+<li>Triplet Loss and other generalization - Triplet loss simply tries to contrast pairs of pairs. So there is a desirable pair and an undesirable pair. This just generalizes the idea of class-label-based equivalence classes to just directly classifying pairs of examples.<br><br></li>
+<li>Noise Contrastive Estimation - This is used for density estimation in special types of energy-based-models called the log-linear models where the gradient of the log-likelihood of a sample equals the sample-features minus the expected value of the features under the model's own distribution. The basic idea is to draw negative samples from some kind of a proposal distribution , make one assumption that the partition function is 1, and then do energy based modeling.</li>
+<li>Negative Sampling - Make the score of the data higher and make the score of the noise-words lower in the context of the current word.<br><br></li>
+<li>SimCLR - See below.<br><br></li>
+<li>Contrastive Estimation by Smith and Eisner - Come up with perturbations that destroy meaning so much that it's better to treat them as negative examples.</li>
+</ol>
+<p><em><span style="text-decoration: underline;">Generalized contrast and agreement</span></em></p>
+<p>In general there can be two types of perturbations, once which preserve meaning/semantics, e.g. small guassian noise in images, adding small patches, cropping, translation, and ones which destory all meaning, such as sampling from a completely different distribution called the noise distribution, extreme permutation of pixels, replacing with instances from a different class.&nbsp;Within NLP it is easy to come up with meaning-destroying perturbation such as permutation, replacement by different noisy sentence,&nbsp; however it is a lot harder to come up with a meaning preserving perturbation, one way would be back-translation, another way will be replacing certain words by their synonyms, or by "visual back-translation"</p>
+<p>Good methods use both types of perturbations, e.g. the SimCLR method maximizes agreement between the representations of meaning preserving perturbations and it minimizes agreement between representations of random unrelated data-samples.</p>
+
+</body>
+</html>
